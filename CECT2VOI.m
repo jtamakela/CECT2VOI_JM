@@ -24,6 +24,7 @@ filesavename = 'VOI_data.mat'; %Saved under this name
 
 
 
+
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % CHECK THIS ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -38,14 +39,13 @@ resolution = [40 40 40]; %[Z X Y]. Voxel size in micrometers. Defines also the a
 
 
 
-
 aspectratio = resolution./min(resolution); %Drawing the figures based on the given resolution
 
 %Preallocating the final parameters
 % Thicknesses = cell([]);
 info = [];
 
-filuname = dir('0h_50registration.nii');
+filuname = dir('0h_50registration.nii'); %Used to pick measurement points
 filuname = filuname.name;
 % LOAD IMAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Dicoms = niftiread(filuname);
@@ -384,7 +384,7 @@ VOIRotated = imrotate3(VOIRotated,th(1),[0 1 0],'nearest','loose','FillValues',-
 
 end %FUNCTION
 
-% % % % % % %% tHIS CAN BE USED FOR VALIDATION
+% % % % % % %% THIS CAN BE USED FOR VALIDATION
 % % % % % %
 % % % % % % clear VOIRotated_x
 % % % % % % clear VOIRotated_y
