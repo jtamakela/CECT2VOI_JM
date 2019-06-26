@@ -171,7 +171,6 @@ end
 close(h2)
 % -----------------------------------------------------------------------------------------------
 
-
 % ANALYZING ALL THE FILES
 
 h2 = waitbar(0,'Analyzing all timepoints, please wait...'); %Display waitbar
@@ -182,7 +181,7 @@ for numoffiles = order %The order of measurements (16)
     % LOAD IMAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Dicoms = niftiread(niiname{numoffiles});
     for numofpoints = 1:length(Coordinates)                                         % POINT1                           % POINT2
-        ORIENTEDVOI{numofpoints, counter} = VOIOrienter(Dicoms, MASK{numofpoints}, Coordinates{numofpoints}(1:3), Coordinates{numofpoints}(1:3), lims{numofpoints}); %Does the masking and orientation
+        ORIENTEDVOI{numofpoints, counter} = VOIOrienter(Dicoms, MASK{numofpoints}, Coordinates{numofpoints}(1:3), Coordinates{numofpoints}(4:6), lims{numofpoints}); %Does the masking and orientation
     end
     waitbar(counter/length(niifiles));
     counter = counter + 1;
