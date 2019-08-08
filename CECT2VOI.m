@@ -2,7 +2,7 @@ function DATA = CECT2VOI_JM
 %% m-file for analysing registered CECT images (.nii)
 %% Developed for triple contrast images
 %% The code is available at https://github.com/jtamakela/CECT2VOI_JM
-%% (c) Janne Mäkelä June / 2019
+%% (c) Janne T.A. Mäkelä, June / 2019
 % Click on the measurement location and analyze
 % Creates a cubical VOI from the chosen location which is then saved for later analysis
 
@@ -190,7 +190,9 @@ close(h2)
 
 DATA = {niiname(order), ORIENTEDVOI, Coordinates'};
 
-save([foldername, '_', filesavename], 'DATA')
+% Don't overwrite
+save([foldername, '_', filesavename, num2str(length(dir('*_VOI_data*.mat'))+1)], 'DATA')
+
 
 
 end
