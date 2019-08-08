@@ -216,7 +216,7 @@ for subimages_i = 1:2 % 1=X-direction, 2=Y-direction
     
     % Calculating normals
     % Length half the length of the vector
-    normal = 0.5*norm(A-B).*(null(A-B)');
+    normal = 0.5*norm(A-B).*(null(A-B)'); 2 mm
     
     %Coordinates of the normals (takes with if into account the orientations)
     if normal(1) < 0
