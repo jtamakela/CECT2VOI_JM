@@ -191,7 +191,7 @@ close(h2)
 DATA = {niiname(order), ORIENTEDVOI, Coordinates'};
 
 % Don't overwrite
-save([foldername, '_', filesavename, num2str(length(dir('*_VOI_data*.mat'))+1)], 'DATA')
+save([foldername, '_', filesavename(1:end-4), num2str(length(dir('*_VOI_data*.mat'))+1), filesavename(end-3:end)], 'DATA')
 
 
 
