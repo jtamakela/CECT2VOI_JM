@@ -157,7 +157,8 @@ end
 % keyboard
     % VOIs are analyzed for all the locations length(Coordinates)   
     h2 = waitbar(0,'Creating masks, please wait...'); %Display waitbar
-    for numofpoints = 1:length(Coordinates) %The number of locations (6)
+    % Parfor eats memory like a SOB, and doesn't draw the rectangles. But gets s**t done fast!
+    parfor numofpoints = 1:length(Coordinates) %The number of locations (6)
         
         %The two points that define ROI
         POINT1 = Coordinates{numofpoints}(1:3); % Above [X Y Z]
@@ -216,7 +217,7 @@ for subimages_i = 1:2 % 1=X-direction, 2=Y-direction
     
     % Calculating normals
     % Length half the length of the vector
-    normal = 0.5*norm(A-B).*(null(A-B)'); 2 mm
+    normal = 1*norm(A-B).*(null(A-B)');
     
     %Coordinates of the normals (takes with if into account the orientations)
     if normal(1) < 0
