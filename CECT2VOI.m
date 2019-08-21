@@ -157,8 +157,10 @@ end
 % keyboard
     % VOIs are analyzed for all the locations length(Coordinates)   
     h2 = waitbar(0,'Creating masks, please wait...'); %Display waitbar
+    
+    % OPTION TO USE PARFOR
     % Parfor eats memory like a SOB, and doesn't draw the rectangles. But gets s**t done fast!
-    parfor numofpoints = 1:length(Coordinates) %The number of locations (6)
+    for numofpoints = 1:length(Coordinates) %The number of locations (6)
         
         %The two points that define ROI
         POINT1 = Coordinates{numofpoints}(1:3); % Above [X Y Z]
