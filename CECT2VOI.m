@@ -113,10 +113,7 @@ while ~isempty(xcoord) %If enter is not pressed
         disp(['Measured thickness in #', num2str(location_i), ' is ', num2str(Thicknesses(location_i)), ' um'])
         
         XCOORD(location_i) = xcoord; %Saving
-        YCOORD(location_i) = ycoord;
-        
-        save('THICKNESS_temp.mat','Thicknesses', 'XCOORD', 'YCOORD') % In case the code crashes
-        
+        YCOORD(location_i) = ycoord;        
         
         location_i = location_i+1;
     end
@@ -195,7 +192,6 @@ DATA = {niiname(order), ORIENTEDVOI, Coordinates'};
 
 % Don't overwrite
 save([foldername, '_', filesavename(1:end-4), num2str(length(dir('*_VOI_data*.mat'))+1), filesavename(end-3:end)], 'DATA')
-
 
 
 end
