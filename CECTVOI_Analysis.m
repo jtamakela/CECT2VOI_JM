@@ -1,4 +1,3 @@
-% function DATA = CECT2VOI_JM
 %% m-file for analysing CECT image VOIs
 %% Developed for triple contrast images
 %% The code is available at https://github.com/jtamakela/
@@ -8,16 +7,20 @@
 
 clear all, close all, clc;
 
+% For saving
+foldername = pwd;
+foldername = foldername(max(strfind(foldername,'/'))+1:max(strfind(foldername,'/'))+4); %Checking the folder name
+
 
 % Analysis
 % Rectangle VOI - 1 mm3
-for mittauspiste = 1:6 %2 ja 5 ei toimi; %1:6
-% mittauspiste = 1;
+for location = 1:6 %2 ja 5 ei toimi; %1:6
+% location = 1;
 
 
 
 % Loading the data  -----------------------------------------------------------------------------------
-filename = dir('kuusi*VOI_data*.mat');
+filename = dir('*VOI_data*.mat');
 filename = filename(end).name; %Reads the last mat file
 load(filename);
 
@@ -54,19 +57,19 @@ timepoint = 1;
 % % % % SEPARATE ENERGIES PLOT
 % % % figure(1); 
 % % % subplot(1,2,1)
-% % % imagesc(squeeze(CECT50{mittauspiste,timepoint}(:,floor(size(CECT50{mittauspiste,timepoint},2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
+% % % imagesc(squeeze(CECT50{location,timepoint}(:,floor(size(CECT50{location,timepoint},2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
 % % % view(90, 90)
 % % % axis equal
 % % % title('50 kV')
-% % % ylim([0 size(CECT50{mittauspiste,timepoint},1)]);
+% % % ylim([0 size(CECT50{location,timepoint},1)]);
 % % % %caxis([0 5000])
 % % % 
 % % % subplot(1,2,2)
-% % % imagesc(squeeze(CECT90{mittauspiste,timepoint}(:,floor(size(CECT90{mittauspiste,timepoint},2)/2),:)), [-1500 5000]);
+% % % imagesc(squeeze(CECT90{location,timepoint}(:,floor(size(CECT90{location,timepoint},2)/2),:)), [-1500 5000]);
 % % % view(90, 90)
 % % % axis equal
 % % % title('90 kV')
-% % % ylim([0 size(CECT90{mittauspiste,timepoint},1)]);
+% % % ylim([0 size(CECT90{location,timepoint},1)]);
 
 %caxis([0 100])
 
@@ -79,11 +82,11 @@ windowsize = 1000/40; %um/resolution. Default 1mm, typically 1040um because of u
 
 % LIMITS  -----------------------------------------------------------------------------------------------------------------
 %X and Y just from the middle
-x1 = floor(size(CECT50{mittauspiste,timepoint},1)/2)-ceil(windowsize/2); %Moves the window left if windowsize is odd number
-x2 = floor(size(CECT50{mittauspiste,timepoint},1)/2)+floor(windowsize/2);
+x1 = floor(size(CECT50{location,timepoint},1)/2)-ceil(windowsize/2); %Moves the window left if windowsize is odd number
+x2 = floor(size(CECT50{location,timepoint},1)/2)+floor(windowsize/2);
 
-y1 = floor(size(CECT50{mittauspiste,timepoint},2)/2)-ceil(windowsize/2); %Moves the window left if windowsize is odd number
-y2 = floor(size(CECT50{mittauspiste,timepoint},2)/2)+floor(windowsize/2);
+y1 = floor(size(CECT50{location,timepoint},2)/2)-ceil(windowsize/2); %Moves the window left if windowsize is odd number
+y2 = floor(size(CECT50{location,timepoint},2)/2)+floor(windowsize/2);
 
 
 
@@ -100,7 +103,7 @@ figure(98);
 
 % Going through all the timepoints -------------
 for i = 1:8
-keke = CECT50{mittauspiste,i};
+keke = CECT50{location,i};
 keke(keke==-1000) = nan;
 keke(keke==0) = nan;
 
@@ -118,7 +121,7 @@ close(99)
 end
 figure(99);
 for i = 1:8
-keke = CECT90{mittauspiste,i};
+keke = CECT90{location,i};
 keke(keke==-1000) = nan;
 keke(keke==0) = nan;
 
@@ -140,11 +143,13 @@ sumfor90 = sum(profile90_x,2);
 
 difference = diff(sumfor50);
 
-
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % UNCOMMENT IF YOU WANT TO SEE THE PROFILE OR DIFFERENCE
 % figure; plot(sumfor50)
-figure; plot(difference)
-
+% figure; plot(difference)
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
 % [pks, locs] = findpeaks(difference(1:floor(length(difference)./2)),'NPeaks',1,'MinPeakWidth',3); %MinPeakWidth can exclude or
 % includewron peaks. Using xax instead
@@ -168,7 +173,7 @@ z2 = locs(2);
 
 
 
-% disp(['Bone interface signal at ', num2str(mittauspiste), ' point = ', num2str(pks(2))]);
+% disp(['Bone interface signal at ', num2str(location), ' point = ', num2str(pks(2))]);
 
 % Displaying the lines in the image -----------------------------------------------------------------------------------------
 
@@ -183,12 +188,12 @@ line([locs(2) locs(2)], [min(profile50_x(:)) max(profile90_x(:))],'color','r');
 % % IF YOU WANT TO SEE THE LIMITS ALSO WITH 90 kV
 % figure(1)
 % subplot(1,2,1)
-% line([locs(1) locs(1)],[0, size(CECT50{mittauspiste,timepoint},1)], 'Color', 'g')
-% line([locs(2) locs(2)],[0, size(CECT50{mittauspiste,timepoint},1)], 'Color', 'r')
+% line([locs(1) locs(1)],[0, size(CECT50{location,timepoint},1)], 'Color', 'g')
+% line([locs(2) locs(2)],[0, size(CECT50{location,timepoint},1)], 'Color', 'r')
 % 
 % subplot(1,2,2)
-% line([locs(1) locs(1)],[0, size(CECT50{mittauspiste,timepoint},1)], 'Color', 'g')
-% line([locs(2) locs(2)],[0, size(CECT50{mittauspiste,timepoint},1)], 'Color', 'r')
+% line([locs(1) locs(1)],[0, size(CECT50{location,timepoint},1)], 'Color', 'g')
+% line([locs(2) locs(2)],[0, size(CECT50{location,timepoint},1)], 'Color', 'r')
 
 
 
@@ -196,19 +201,19 @@ line([locs(2) locs(2)], [min(profile50_x(:)) max(profile90_x(:))],'color','r');
 
 figure(2); 
 subplot(1,2,1)
-imagesc(squeeze(CECT50{mittauspiste,timepoint}(:,floor(size(CECT50{mittauspiste,timepoint},2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
+imagesc(squeeze(CECT50{location,timepoint}(:,floor(size(CECT50{location,timepoint},2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
 view(90, 90)
 axis equal
 title('X-angle')
-ylim([0 size(CECT50{mittauspiste,timepoint},1)]);
+ylim([0 size(CECT50{location,timepoint},1)]);
 %caxis([0 5000])
 
 subplot(1,2,2)
-imagesc(squeeze(CECT50{mittauspiste,timepoint}(floor(size(CECT50{mittauspiste,timepoint},1)/2),:,:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
+imagesc(squeeze(CECT50{location,timepoint}(floor(size(CECT50{location,timepoint},1)/2),:,:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
 view(90, 90)
 axis equal
 title('Y-angle')
-ylim([0 size(CECT50{mittauspiste,timepoint},2)]);
+ylim([0 size(CECT50{location,timepoint},2)]);
 
 
 % Cropping the 1mm rectangle region  -----------------------------------------------------------------------------------------------------
@@ -221,19 +226,19 @@ figure(2)
 
 %Vertical
 subplot(1,2,1)
-line([locs(1) locs(1)],[0, size(CECT50{mittauspiste,timepoint},1)], 'Color', 'g')
-line([locs(2) locs(2)],[0, size(CECT50{mittauspiste,timepoint},1)], 'Color', 'r')
+line([locs(1) locs(1)],[0, size(CECT50{location,timepoint},1)], 'Color', 'g')
+line([locs(2) locs(2)],[0, size(CECT50{location,timepoint},1)], 'Color', 'r')
 subplot(1,2,2)
-line([locs(1) locs(1)],[0, size(CECT50{mittauspiste,timepoint},2)], 'Color', 'g')
-line([locs(2) locs(2)],[0, size(CECT50{mittauspiste,timepoint},2)], 'Color', 'r')
+line([locs(1) locs(1)],[0, size(CECT50{location,timepoint},2)], 'Color', 'g')
+line([locs(2) locs(2)],[0, size(CECT50{location,timepoint},2)], 'Color', 'r')
 
 %Horizontal
 subplot(1,2,1)
-line([0, size(CECT50{mittauspiste,timepoint},3)],[x1, x1], 'Color', 'g')
-line([0, size(CECT50{mittauspiste,timepoint},3)],[x2, x2], 'Color', 'r')
+line([0, size(CECT50{location,timepoint},3)],[x1, x1], 'Color', 'g')
+line([0, size(CECT50{location,timepoint},3)],[x2, x2], 'Color', 'r')
 subplot(1,2,2)
-line([0, size(CECT50{mittauspiste,timepoint},3)],[y1, y1], 'Color', 'g')
-line([0, size(CECT50{mittauspiste,timepoint},3)],[y2, y2], 'Color', 'r')
+line([0, size(CECT50{location,timepoint},3)],[y1, y1], 'Color', 'g')
+line([0, size(CECT50{location,timepoint},3)],[y2, y2], 'Color', 'r')
 
 
 
@@ -242,13 +247,18 @@ line([0, size(CECT50{mittauspiste,timepoint},3)],[y2, y2], 'Color', 'r')
 % Saving the profiles
 
 % Analyzing again all the timepoints
-RESULT_PROFILES50{mittauspiste} = profile50_x(z1:z2,:);
-RESULT_PROFILES90{mittauspiste} = profile90_x(z1:z2,:);
-
-save('RESULT_PROFILES.mat','RESULT_PROFILES50', 'RESULT_PROFILES90')
+RESULT_PROFILES50{location} = profile50_x(z1:z2,:);
+RESULT_PROFILES90{location} = profile90_x(z1:z2,:);
 
 
+pause(1)
 end
+
+
+% Save, but don't overwrite
+save([foldername, '_', 'RESULT_PROFILES', num2str(length(dir('*RESULT_PROFILES*.mat'))+1), '.mat'],'RESULT_PROFILES50', 'RESULT_PROFILES90')
+
+
 
 
 
