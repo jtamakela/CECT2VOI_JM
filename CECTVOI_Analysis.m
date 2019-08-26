@@ -11,10 +11,12 @@ clear all, close all, clc;
 foldername = pwd;
 foldername = foldername(max(strfind(foldername,'/'))+1:max(strfind(foldername,'/'))+4); %Checking the folder name
 
+%If saving == 1, saves the output
+saving = 1;
 
 % Analysis
 % Rectangle VOI - 1 mm3
-for location = 1:6 %2 ja 5 ei toimi; %1:6
+for location = 1:6 %There should exist 6 measurement locations
 % location = 1;
 
 
@@ -256,8 +258,9 @@ end
 
 
 % Save, but don't overwrite
+if saving == 1;
 save([foldername, '_', 'RESULT_PROFILES', num2str(length(dir('*RESULT_PROFILES*.mat'))+1), '.mat'],'RESULT_PROFILES50', 'RESULT_PROFILES90')
-
+end
 
 
 
