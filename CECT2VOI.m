@@ -45,7 +45,7 @@ aspectratio = resolution./min(resolution); %Drawing the figures based on the giv
 % Thicknesses = cell([]);
 info = [];
 
-filuname = dir('0h_50registration.nii'); %Used to pick measurement points
+filuname = dir('Baselineh_50registration.nii'); %Used to pick measurement points
 filuname = filuname.name;
 % LOAD IMAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Dicoms = niftiread(filuname);
