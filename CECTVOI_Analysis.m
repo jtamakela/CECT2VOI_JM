@@ -16,8 +16,6 @@ saving = 1;
 
 % Analysis
 % Rectangle VOI - 1 mm3
-for location = 1:6 %There should exist 6 measurement locations
-% location = 1;
 
 
 
@@ -31,6 +29,9 @@ names = DATA{1,1};
 CECT_all = DATA{1,2};
 
 Coordinates = DATA{1,3};
+
+for location = 1:size(CECT_all,1) %How many measured locations
+% location = 1;
 
 
 counter = 1;
