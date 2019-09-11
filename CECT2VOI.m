@@ -51,6 +51,11 @@ filuname = filuname.name;
 Dicoms = niftiread(filuname);
 info = niftiinfo(filuname);
 
+% % % % % Change this if you don't want the figure mirrored % % % % % % % % % % % % % % % % % % % % % 
+% Mirroring the image so that the view is from above
+Dicoms = fliplr(Dicoms);
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+
 
 % % This is for rescaling the voxel values
 % % Not necessary if imagesc is used
