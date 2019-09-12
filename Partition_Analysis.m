@@ -99,7 +99,7 @@ P100_profile90(:,1,:) = [];
 
 % Plotting 
 figure
-for location = 1:6
+for location = 1:length(RESULT_PROFILES50)
     % 50kV
     subplot(1,2,1)
     % plot(profiles50);
@@ -216,7 +216,7 @@ C_CA = 10;% Change if you want partition: 10;
 C_Gd = 20;%20;
 
 
-for location = 1:6
+for location = 1:length(RESULT_PROFILES50)
     figure
     
     for time = 1:7
