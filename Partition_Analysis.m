@@ -7,7 +7,7 @@ clear all, close all, clc;
 
 filename = dir('*RESULT_PROFILES*.mat');
 
-filename = filename(end).name; %Reads the last/latest mat file
+filename = filename(end-1).name; %Reads the last/latest mat file
 load(filename);
 
 % 10 mgI/ml, 20 mgGd/ml
@@ -15,10 +15,10 @@ load(filename);
 % By Ali % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % As a function of concentration
 % Calibration/Phantom_measurement.xlsx
-Gd50 = [36.32];
-Gd90 = [37.34];
-CA50 = [73.87];
-CA90 = [29.53];
+Gd50 = [36.32, 49.64];
+Gd90 = [37.34, 20.50];
+CA50 = [73.87, 89.58];
+CA90 = [29.53, 40.46];
 
 % Constants
 Water50 = 543.166; %Above values are normalized
@@ -28,14 +28,14 @@ Water90 = -234.254;
 
 fileorder = {'Baseline_50','Baseline_90','0h_50','0h_90', '30min_50','30min_90','1h_50','1h_90','2h_50','2h_90','6h_50','6h_90','10h_50','10h_90','23h_50','23h_90'};
 timepoints = [0, 0.5, 1, 2, 6, 10, 23]; %hours
-interpolation_n = 20; %You can determine how many points the data is interpolated into. 
+interpolation_n = 50; %You can determine how many points the data is interpolated into. 
 depths = linspace(1,100, interpolation_n);
 
 % Inspecting first the 50 kV
 % h2 = waitbar(0,'Loading the files, please wait...'); %Display waitbar
     figure;
 
-for location = 1:6
+for location = 1:length(RESULT_PROFILES50)
     
     profiles50 = RESULT_PROFILES50{location};
     profiles90 = RESULT_PROFILES90{location};
@@ -125,7 +125,7 @@ for location = 1:6
     
 end
     title('Contrast Agent Attenuation');
-%%
+%
 % Plotting
 
 meanprofiles50 = squeeze(mean(P100_profile50,1)); %Averaging the thickness
@@ -183,7 +183,7 @@ ylabel('Attenuation (AU)')
 title('90 kV')
 % legend([''], 'location', 'southeastoutside');
 % legend('boxoff')
-%%
+
 
 % % % % % % % % % % % % % % % % AVERAGES FOR THE LOCATIONS --------------------------------------------------
 % % % % % % % % % % % % % % % finalmeanprofiles50 = mean(meanprofiles50,2);
@@ -221,10 +221,14 @@ for location = 1:6
     
     for time = 1:7
         
-        A = [CA50(1)*C_CA Gd50(1)*C_Gd;
-            CA90(1)*C_CA Gd90(1)*C_Gd];
+        A = [CA50(1)*C_CA+CA50(2) Gd50(1)*C_Gd+Gd50(2); %Keeping the residue in results (zero points)
+            CA90(1)*C_CA+CA90(2) Gd90(1)*C_Gd+CA90(2)];
+        
+        
         % b = [meanprofiles50(:,location) meanprofiles90(:,location)]';
         b = [P100_profile50(:,time,location) P100_profile90(:,time,location)]';
+        
+        
         concentration_profile = A\b;
         
         % yyaxis left
@@ -238,11 +242,13 @@ for location = 1:6
         % plot(timepoints, concentration_profile(2,:), 'r')
         plot(depths, concentration_profile(2,:), 'r')
         title('Enzymatically + Mechanically - Partition in Cartilage','fontsize',14)
-        % legend('I', 'Gd');
+        legend('I', 'Gd');
         set(gca,'fontsize',14)
         % ylabel('Gadolinium (%)');
         % ylim([0 0.5]);
         
+        GADOLINIUM(:,time,location) = concentration_profile(2,:)';
+        IODINE(:,time,location) = concentration_profile(1,:)';
         
     end
 end
