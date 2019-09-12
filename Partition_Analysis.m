@@ -7,7 +7,7 @@ clear all, close all, clc;
 
 filename = dir('*RESULT_PROFILES*.mat');
 
-filename = filename(end-1).name; %Reads the last/latest mat file
+filename = filename(end).name; %Reads the last/latest mat file
 load(filename);
 
 % 10 mgI/ml, 20 mgGd/ml
