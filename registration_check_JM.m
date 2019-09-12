@@ -46,6 +46,7 @@ info = niftiinfo(filuname);
 
 figure;
 imagesc(V(:,:,300), [-1500 5000]);
+% imagesc(median(V,3));
 set(gca, 'XDir', 'reverse'); %From above
 title(filuname, 'interpreter', 'none')
     waitbar(counter/length(niinames));
