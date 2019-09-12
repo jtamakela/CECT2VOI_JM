@@ -14,7 +14,11 @@ DATA = load(filename);
 
 h2 = waitbar(0,'Loading the files, please wait...'); %Display waitbar
 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 whichpoint = 1; %Determines the point of measurement
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 for ii = [1:2:length(DATA.DATA{1,2}), 2:2:length(DATA.DATA{1,2})]
 
