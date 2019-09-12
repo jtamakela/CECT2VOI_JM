@@ -48,14 +48,9 @@ info = [];
 filuname = dir('Baseline_50registration.nii'); %Used to pick measurement points
 filuname = filuname.name;
 % LOAD IMAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Dicoms = niftiread(filuname);
+% Dicoms = niftiread(filuname); %This is now in a separafet fucntion because mirroring
+Dicoms = read_nifti(filuname);
 info = niftiinfo(filuname);
-
-% % % % % Change this if you don't want the figure mirrored % % % % % % % % % % % % % % % % % % % % % 
-% Mirroring the image so that the view is from above
-Dicoms = fliplr(Dicoms);
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-
 
 % % This is for rescaling the voxel values
 % % Not necessary if imagesc is used
@@ -184,7 +179,8 @@ for numoffiles = order %The order of measurements (16)
     
 %     niiname{numoffiles} = niifiles(numoffiles).name;
     % LOAD IMAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    Dicoms = niftiread(niiname{numoffiles});
+%     Dicoms = niftiread(niiname{numoffiles}); %Read separately in its own function
+    Dicoms = read_nifti(niiname{numoffiles});
     for numofpoints = 1:length(Coordinates)                                         % POINT1                           % POINT2
         ORIENTEDVOI{numofpoints, counter} = VOIOrienter(Dicoms, MASK{numofpoints}, Coordinates{numofpoints}(1:3), Coordinates{numofpoints}(4:6), lims{numofpoints}); %Does the masking and orientation
     end
@@ -198,6 +194,20 @@ DATA = {niiname(order), ORIENTEDVOI, Coordinates'};
 % Don't overwrite
 save([foldername, '_', filesavename(1:end-4), num2str(length(dir('*_VOI_data*.mat'))+1), filesavename(end-3:end)], 'DATA')
 
+
+end
+
+function newfigure = read_nifti(thenameofthefile)
+% niftis are read twice during the execution of this code
+% niftiread is done separately in this function because the figure is mirrored.
+% This prevents reading the files differently
+
+newfigure = niftiread(thenameofthefile);
+
+% % % % % Change this if you don't want the figure mirrored % % % % % % % % % % % % % % % % % % % % % 
+% Mirroring the image so that the view is from above
+newfigure = fliplr(newfigure);
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 end
 
