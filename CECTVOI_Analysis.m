@@ -1,3 +1,4 @@
+function [RESULT_PROFILES50, RESULT_PROFILES90] = CECTVOI_Analysis
 %% m-file for analysing CECT image VOIs
 %% Developed for triple contrast images
 %% The code is available at https://github.com/jtamakela/
@@ -263,7 +264,7 @@ if saving == 1;
 save([foldername, '_', 'RESULT_PROFILES', num2str(length(dir('*RESULT_PROFILES*.mat'))+1), '.mat'],'RESULT_PROFILES50', 'RESULT_PROFILES90')
 end
 
-
+end % function
 
 
 
