@@ -34,6 +34,16 @@ resolution = [40 40 40]; %[Z X Y]. Voxel size in micrometers. Defines also the a
 
 
 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+%Pick the first location
+%[xcoord, ycoord] = ginput(1);
+% Has to be mirrored
+YCOORD = size(Dicoms,2)-[200.408851884312	323.06149576395	429.260736196319	390.370873502775	273.701285422144	155.535933391762		];
+XCOORD = [127.864300321355	166.754163014899	208.635553607946	275.944931346772	235.559304703476	181.711802512416];
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
 
 
 
@@ -88,12 +98,8 @@ title('Pick the location. Press enter to quit'); %
 % question = menu('Satisfied?','1) Yes','2) No'); %Option to fall back should be added
 question = 1; %"Satisfied?"
 
-%Pick the first location
-%[xcoord, ycoord] = ginput(1);
-% Has to be mirrored
-YCOORD = size(Dicoms,2)-[200.408851884312	323.06149576395	429.260736196319	390.370873502775	273.701285422144	155.535933391762		];
-XCOORD = [127.864300321355	166.754163014899	208.635553607946	275.944931346772	235.559304703476	181.711802512416];
 
+% Starting the analysis ------------------------------------------------------------------
 %Just preallocating
 xcoord = 1;
 ycoord = 1;
