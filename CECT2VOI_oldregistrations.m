@@ -5,7 +5,7 @@ function DATA = CECT2VOI_JM
 %% (c) Janne T.A. Mäkelä, June / 2019
 % Click on the measurement location and analyze
 % Creates a cubical VOI from the chosen location which is then saved for later analysis
-% Be in the 
+
 
 % SAVES 'FOLDERNAME'_VOI_DATA.MAT -FILE
 % With names, matrixes, and coordinates for backup
@@ -21,8 +21,9 @@ foldername = foldername(max(strfind(foldername,'/'))+1:max(strfind(foldername,'/
 
 filesavename = 'VOI_data.mat'; %Saved under this name
 
-%Just going in the 'new_registrations' folder
-cd new_registrations
+
+
+
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -44,9 +45,7 @@ aspectratio = resolution./min(resolution); %Drawing the figures based on the giv
 % Thicknesses = cell([]);
 info = [];
 
-filuname = dir('Baseline_50.nii'); %Used to pick measurement points
-% It used to be this for the old registrations: filuname = dir('Baseline_50registration.nii'); %Used to pick measurement points
-
+filuname = dir('Baseline_50registration.nii'); %Used to pick measurement points
 filuname = filuname.name;
 % LOAD IMAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Dicoms = niftiread(filuname); %This is now in a separafet fucntion because mirroring
@@ -89,22 +88,12 @@ title('Pick the location. Press enter to quit'); %
 question = 1; %"Satisfied?"
 
 %Pick the first location
-%[xcoord, ycoord] = ginput(1);
-% Has to be mirrored
-YCOORD = size(Dicoms,2)-[200.408851884312	323.06149576395	429.260736196319	390.370873502775	273.701285422144	155.535933391762		];
-XCOORD = [127.864300321355	166.754163014899	208.635553607946	275.944931346772	235.559304703476	181.711802512416];
-
-%Just preallocating
-xcoord = 1;
-ycoord = 1;
+[xcoord, ycoord] = ginput(1);
 
 % Preallocation
 location_i = 1;
 % Marking the locations ----------------------------------------------------------------
-while ~isempty(xcoord)  %If enter is not pressed
-    
-    xcoord = XCOORD(location_i);
-    ycoord = YCOORD(location_i);
+while ~isempty(xcoord) %If enter is not pressed
     
     plot(xcoord,ycoord,'+','markersize', 40, 'Linewidth', 1.5)
     text(xcoord+20,ycoord-20,num2str(location_i),'HorizontalAlignment','center','fontsize', 20);
@@ -123,22 +112,17 @@ while ~isempty(xcoord)  %If enter is not pressed
         
         disp(['Measured thickness in #', num2str(location_i), ' is ', num2str(Thicknesses(location_i)), ' um'])
         
-        % Not needed if using saved coordinates
-%         XCOORD(location_i) = xcoord; %Saving
-%         YCOORD(location_i) = ycoord;        
+        XCOORD(location_i) = xcoord; %Saving
+        YCOORD(location_i) = ycoord;        
         
         location_i = location_i+1;
     end
     
     figure(1);
     pause(1) %Reduces crashing
-%     title('Pick the location. Press enter to quit'); %
-%     [xcoord, ycoord] = ginput(1);
-    title([num2str(location_i), '. point']);
+    title('Pick the location. Press enter to quit'); %
+    [xcoord, ycoord] = ginput(1);
     
-    if location_i == 7  % Stop the execution after 6 points
-        break
-    end
 end
 
 
@@ -209,8 +193,6 @@ DATA = {niiname(order), ORIENTEDVOI, Coordinates'};
 
 % Don't overwrite
 save([foldername, '_', filesavename(1:end-4), num2str(length(dir('*_VOI_data*.mat'))+1), filesavename(end-3:end)], 'DATA')
-
-cd .. %Coming down from 'new_registrations'
 
 
 end
@@ -786,4 +768,5 @@ elseif question == 2
     figchoice = 13; %Stops the execution
     
 end %if question
+
 end %function
