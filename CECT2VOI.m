@@ -31,21 +31,9 @@ cd new_registrations
 resolution = [40 40 40]; %[Z X Y]. Voxel size in micrometers. Defines also the aspect ratio in figures
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-
-
-
+% This defines how wide window we want to save. 0.5 = square, 1 = width is double of depth
+WIDTH = 1;
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-%Pick the first location
-%[xcoord, ycoord] = ginput(1);
-% Has to be mirrored
-YCOORD = size(Dicoms,2)-[200.408851884312	323.06149576395	429.260736196319	390.370873502775	273.701285422144	155.535933391762		];
-XCOORD = [127.864300321355	166.754163014899	208.635553607946	275.944931346772	235.559304703476	181.711802512416];
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-
-
-
 
 
 aspectratio = resolution./min(resolution); %Drawing the figures based on the given resolution
@@ -67,6 +55,16 @@ info = niftiinfo(filuname);
 % % Not necessary if imagesc is used
 %Dicoms = Dicoms.*info.RescaleSlope+info.RescaleIntercept;
 % % Otherwise handles data using native pixel values (original, short integer value)
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+%Pick the first location
+%[xcoord, ycoord] = ginput(1);
+% Has to be mirrored
+YCOORD = size(Dicoms,2)-[200.408851884312	323.06149576395	429.260736196319	390.370873502775	273.701285422144	155.535933391762		];
+XCOORD = [127.864300321355	166.754163014899	208.635553607946	275.944931346772	235.559304703476	181.711802512416];
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
 
 
 %Orienting the figures
@@ -186,7 +184,7 @@ end
         POINT2 = Coordinates{numofpoints}(4:6); % Below [X Y Z]
         
         %Cropping [x, y, z]
-        [MASK{numofpoints} lims{numofpoints}] = VOI_returner(Dicoms, POINT1, POINT2, numofpoints);
+        [MASK{numofpoints} lims{numofpoints}] = VOI_returner(Dicoms, POINT1, POINT2, numofpoints, WIDTH);
             waitbar(numofpoints/length(Coordinates));
 
     end
@@ -239,7 +237,7 @@ end
 %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %%
 % This function takes the coordinates and returns the VOI
 
-function [MASK, lims] = VOI_returner(Dicoms, POINT1, POINT2, point_i)
+function [MASK, lims] = VOI_returner(Dicoms, POINT1, POINT2, point_i, WIDTH)
 
 %For subplots
 dualA = [POINT1(1) POINT1(3); POINT1(2:3)]; % Above point X,Z;Y,Z
@@ -253,8 +251,8 @@ for subimages_i = 1:2 % 1=X-direction, 2=Y-direction
     B = dualB(subimages_i,:);
     
     % Calculating normals
-    % Length half the length of the vector
-    normal = 1*norm(A-B).*(null(A-B)');
+    % WIDTH = 0.5 is a square. 
+    normal = WIDTH*norm(A-B).*(null(A-B)');
     
     %Coordinates of the normals (takes with if into account the orientations)
     if normal(1) < 0
