@@ -2,7 +2,7 @@
 function treshold_fit = find_orientation(thestack)
 % Takes an image stack and finds cartilage-bone interface
 % Outputs a fit of the demarcation
-
+ 
 
     % Let's check if the figure needs to be automatically aligned
     % 90 keV data goes great for trying to find bone cartilage interface
