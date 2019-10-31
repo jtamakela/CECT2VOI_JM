@@ -7,9 +7,9 @@ close all
 
 % This just for checking the registration
 
-filename = dir('*_VOI_data*.mat');
+filename = dir('*_RotatedVOI_data*.mat');
 filename = filename(end).name; %Reads the last mat file
-DATA = load(filename);
+load(filename);
 
 
 h2 = waitbar(0,'Loading the files, please wait...'); %Display waitbar
@@ -20,21 +20,21 @@ whichpoint = 1; %Determines the point of measurement
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-for ii = [1:2:length(DATA.DATA{1,2}), 2:2:length(DATA.DATA{1,2})]
+for ii = [1:2:length(NEWDATA{1,2}), 2:2:length(NEWDATA{1,2})]
 
 % figure;
-% imagesc(DATA.DATA{1,2}{whichpoint,ii}(:,:,floor(size(DATA.DATA{1,2}{whichpoint,ii},3)/2))); %Showing mid slice
-    waitbar(ii/length(DATA.DATA{1,2}));
+% imagesc(NEWDATA{1,2}{whichpoint,ii}(:,:,floor(size(NEWDATA{1,2}{whichpoint,ii},3)/2))); %Showing mid slice
+    waitbar(ii/length(NEWDATA{1,2}));
 
 
 
-% dicom_slider(DATA.DATA{1,2}{1,6})
+% dicom_slider(NEWDATA{1,2}{1,6})
 
 
 %  Turning
 % whichtime = 6;
 
-Dicoms = DATA.DATA{1,2}{whichpoint,ii};
+Dicoms = NEWDATA{1,2}{whichpoint,ii};
 %Preallocating for efficiancy
 SUBIM_x = ones(size(Dicoms,3), size(Dicoms,1), size(Dicoms,2));
 SUBIM_y = ones(size(Dicoms,3), size(Dicoms,2), size(Dicoms,1));
@@ -66,7 +66,7 @@ end
 figure; 
 subplot(1,2,1)
 imagesc(SUBIM_x(:,:,floor(size(SUBIM_x,3)/2)), [-1500 5000]);
-title(DATA.DATA{1,1}{1,ii},'interpreter', 'none')
+title(NEWDATA{1,1}{1,ii},'interpreter', 'none')
 % caxis([0 5000])
 subplot(1,2,2)
 imagesc(SUBIM_y(:,:,floor(size(SUBIM_y,3)/2)), [-1500 5000]);
