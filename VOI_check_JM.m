@@ -11,6 +11,10 @@ filename = dir('*_RotatedVOI_data*.mat');
 filename = filename(end).name; %Reads the last mat file
 load(filename);
 
+% % % % BEFORE ORIENTATION
+% % % name = DATA;
+% % % % AFTER ORIENTATION
+% % % name = NEWDATA;
 
 h2 = waitbar(0,'Loading the files, please wait...'); %Display waitbar
 
