@@ -32,11 +32,11 @@ filename = dir('*RotatedVOI_data*.mat');
 filename = filename(whichfile).name; %Reads the last mat file
 load(filename);
 
-names = DATA{1,1};
+names = NEWDATA{1,1};
 
-CECT_all = DATA{1,2};
+CECT_all = NEWDATA{1,2};
 
-Coordinates = DATA{1,3};
+Coordinates = NEWDATA{1,3};
 
 for location = 1:size(CECT_all,1) %How many measured locations
 % location = 1;
@@ -48,11 +48,11 @@ counter = 1;
 for measuredpoints = 1:size(CECT_all,1)
     
     for datalength = 1:2:length(names)
-        names50{counter} = DATA{1,1}{1,datalength};
-        CECT50{measuredpoints,counter} = DATA{1,2}{measuredpoints,datalength};
+        names50{counter} = NEWDATA{1,1}{1,datalength};
+        CECT50{measuredpoints,counter} = NEWDATA{1,2}{measuredpoints,datalength};
         
-        names90{counter} = DATA{1,1}{1,1+datalength};
-        CECT90{measuredpoints,counter} = DATA{1,2}{measuredpoints,1+datalength};
+        names90{counter} = NEWDATA{1,1}{1,1+datalength};
+        CECT90{measuredpoints,counter} = NEWDATA{1,2}{measuredpoints,1+datalength};
         
         counter = counter+1;
     end
