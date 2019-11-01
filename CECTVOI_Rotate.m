@@ -65,7 +65,7 @@ for whichfile = 7%:length(filename);  %Which sample
     % Don't overwrite
     if saving == 1
         
-        save([savename, '__RotatedVOI_data', num2str(length(dir('*_RotatedVOI_data*.mat'))+1), '.mat'], 'NEWDATA');
+        save([savename, '_RotatedVOI_data', num2str(length(dir('*_RotatedVOI_data*.mat'))+1), '.mat'], 'NEWDATA');
     end
     
     
