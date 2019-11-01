@@ -13,12 +13,6 @@ whichfile = 1;
 % Not working: 2, 5, 9
 
 
-
-
-% For saving
-foldername = pwd;
-foldername = foldername(max(strfind(foldername,'/'))+1:max(strfind(foldername,'/'))+4); %Checking the folder name
-
 %If saving == 1, saves the output
 saving = 0;
 
@@ -37,7 +31,7 @@ names = NEWDATA{1,1};
 CECT_all = NEWDATA{1,2};
 
 Coordinates = NEWDATA{1,3};
-
+%
 for location = 1:size(CECT_all,1) %How many measured locations
 % location = 1;
 
@@ -66,21 +60,21 @@ timepoint = 1;
 
 
 % % % % SEPARATE ENERGIES PLOT
-% % % figure(1); 
-% % % subplot(1,2,1)
-% % % imagesc(squeeze(CECT50{location,timepoint}(:,floor(size(CECT50{location,timepoint},2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
-% % % view(90, 90)
-% % % axis equal
-% % % title('50 kV')
-% % % ylim([0 size(CECT50{location,timepoint},1)]);
-% % % %caxis([0 5000])
-% % % 
-% % % subplot(1,2,2)
-% % % imagesc(squeeze(CECT90{location,timepoint}(:,floor(size(CECT90{location,timepoint},2)/2),:)), [-1500 5000]);
-% % % view(90, 90)
-% % % axis equal
-% % % title('90 kV')
-% % % ylim([0 size(CECT90{location,timepoint},1)]);
+figure(1); 
+subplot(1,2,1)
+imagesc(squeeze(CECT50{location,timepoint}(:,floor(size(CECT50{location,timepoint},2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
+view(90, 90)
+axis equal
+title('50 kV')
+ylim([0 size(CECT50{location,timepoint},1)]);
+%caxis([0 5000])
+
+subplot(1,2,2)
+imagesc(squeeze(CECT90{location,timepoint}(:,floor(size(CECT90{location,timepoint},2)/2),:)), [-1500 5000]);
+view(90, 90)
+axis equal
+title('90 kV')
+ylim([0 size(CECT90{location,timepoint},1)]);
 
 %caxis([0 100])
 
@@ -99,9 +93,6 @@ x2 = floor(size(CECT50{location,timepoint},1)/2)+floor(windowsize/2);
 y1 = floor(size(CECT50{location,timepoint},2)/2)-ceil(windowsize/2); %Moves the window left if windowsize is odd number
 y2 = floor(size(CECT50{location,timepoint},2)/2)+floor(windowsize/2);
 
-
-
-
 % ----------------------------------------------------------------------------------
 
 
@@ -111,20 +102,32 @@ close(98)
 end
 figure(98);
 
+% Removing the borders using diff between the timpoints
+ %Taking diff. Seeing all similar values
+CECT_edited = CECT50{location,1}-CECT50{location,2};
+background_i = CECT_edited == 0;
 
-% Going through all the timepoints -------------
+% % % % % % Going through all the timepoints -------------
 for i = 1:8
 keke = CECT50{location,i};
-keke(keke==-1000) = nan;
-keke(keke==0) = nan;
+
+% Changing the background to zeroes
+keke(background_i) = nan;
+
 
 profile50_x(:,i) = reshape(nanmean(keke(x1:x2,y1:y2,:),[1 2]),[],1); % Here (x1:x2,y1:y2,:) makes the code inspect only the center
 
+%  For comparison, if you want to plot the unedited profiles
+% profile50_notedited_x(:,i) = reshape(nanmean(CECT50{location,i}(x1:x2,y1:y2,:),[1 2]),[],1); % Here (x1:x2,y1:y2,:) makes the code inspect only the center
 
 plot(profile50_x)
 hold on;
 
 end
+
+%Check a slice
+% % % figure; imagesc(squeeze(keke(:,33,:))); view(90, 90)
+
 title('50 kV profiles');
 
 if ishandle(99)
@@ -133,8 +136,7 @@ end
 figure(99);
 for i = 1:8
 keke = CECT90{location,i};
-keke(keke==-1000) = nan;
-keke(keke==0) = nan;
+keke(background_i) = nan;
 
 profile90_x(:,i) = reshape(nanmean(keke(x1:x2,y1:y2,:),[1 2]),[],1);
 
@@ -144,23 +146,69 @@ hold on;
 end
 title('90 kV profiles');
 
+%%
 % FINDING THE LAYERS ------------------------------------------------------------------------------------------
 
 % You can find the cartilage from the peaks of ka50 (first, last). Two points should be the same between 50 and 90
 
+%TAKE FIRST THE DIFFERENCE BETWEEN TIMEPOINTS. THIS'LL LEAVE THE RANDOM DATA LEFT
+% or use plain baseline
+
+figure; plot(profile50_x)
+%Taking difference between timepoints
+erot = diff(profile50_x,1,2);
+%Shows the borders (=0) that can be removed
+erot(erot == 0) = nan;
+
+%On the other hand, you now know where the borders are. 
+figure; plot(erot)
+
+erot2 = diff(erot);
+figure; plot(sum(erot2,2));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sumfor50 = sum(profile50_x,2);
 sumfor90 = sum(profile90_x,2);
 
-
+%
 difference = diff(sumfor50);
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % UNCOMMENT IF YOU WANT TO SEE THE PROFILE OR DIFFERENCE
-% figure; plot(sumfor50)
-% figure; plot(difference)
+figure; plot(sumfor50); title('Sum');
+%  For comparison, if you want to plot the unedited profiles
+% hold on; plot(sum(profile50_notedited_x,2));
+
+figure; plot(difference); title('Diff');
+%  For comparison, if you want to plot the unedited profiles
+% hold on; plot(diff(sum(profile50_notedited_x,2)));
+
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+% Tässä on ongelma. Ei osaa enää löytää rajapintaa. Vois koeattaa ottaa nan:t ja -1000 pois
+% Tai vaihtoehtosesti ottaakin vasta toisen piikin?
+% Ainoastaan 5:ssa ei löytänyt luuta. 
 
 % [pks, locs] = findpeaks(difference(1:floor(length(difference)./2)),'NPeaks',1,'MinPeakWidth',3); %MinPeakWidth can exclude or
 % includewron peaks. Using xax instead
