@@ -5,9 +5,19 @@
 
 clear all, close all, clc;
 
-filename = dir('*RESULT_PROFILES*.mat');
+% You want extra figures plotted? 
+% 1 for yes
+doyouwantfigures = 0;
 
-filename = filename(end).name; %Reads the last/latest mat file
+
+files = dir('*Rotated_RESULT_PROFILES*.mat');
+
+for sample_i = 1:length(files)
+%     sample_i = 1
+close all
+clearvars -except files sample_i name tempGd temp_I Eq_Gd Eq_I doyouwantfigures
+
+filename = files(sample_i).name; %Reads the last/latest mat file
 load(filename);
 
 % 10 mgI/ml, 20 mgGd/ml
@@ -50,31 +60,32 @@ for location = 1:length(RESULT_PROFILES50)
     P100_profile90(:,:,location) = interp1(linspace(1,100,length(profiles90)), profiles90, depths,'pchip');
     
     
-    % Depth-dependent attenuation profiles for all the measurement locations at each timepoints
-    % 50kV
-    subplot(1,2,1)
-    % plot(profiles50);
-    plot(P100_profile50(:,:,location));
-    hold on;
-    ylabel('Attenuation (AU)');
-    xlabel('thickness (px)')
-    % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
-    title('50 kV');
-    ylim([-500 6000])
-    
-    % 90 kV
-    % figure;
-    subplot(1,2,2)
-    % plot(profiles90);
-    plot(P100_profile90(:,:,location));
-    hold on;
-    ylabel('Attenuation (AU)');
-    xlabel('thickness (px)')
-    % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
-    title('90 kV');
-    ylim([-1000 2500])
-    
-    
+    if doyouwantfigures == 1
+        % Depth-dependent attenuation profiles for all the measurement locations at each timepoints
+        % 50kV
+        subplot(1,2,1)
+        % plot(profiles50);
+        plot(P100_profile50(:,:,location));
+        hold on;
+        ylabel('Attenuation (AU)');
+        xlabel('thickness (px)')
+        % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+        title('Raw 50 kV');
+        ylim([-500 6000])
+        
+        % 90 kV
+        % figure;
+        subplot(1,2,2)
+        % plot(profiles90);
+        plot(P100_profile90(:,:,location));
+        hold on;
+        ylabel('Attenuation (AU)');
+        xlabel('thickness (px)')
+        % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+        title('Raw 90 kV');
+        ylim([-1000 2500])
+        
+    end
     % waitbar(location/6);
     
 end
@@ -96,35 +107,39 @@ P100_profile90 = P100_profile90-(P100_profile90(:,1,:));
 P100_profile50(:,1,:) = []; %Removing zeroes
 P100_profile90(:,1,:) = [];
 
-
-% Plotting 
-figure
-for location = 1:length(RESULT_PROFILES50)
-    % 50kV
-    subplot(1,2,1)
-    % plot(profiles50);
-    plot(P100_profile50(:,:,location));
-    hold on;
-    ylabel('Attenuation (AU)');
-    xlabel('thickness (px)')
-    % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
-    title('50 kV');
-    ylim([-500 6000])
-    
-    % 90 kV
-    % figure;
-    subplot(1,2,2)
-    % plot(profiles90);
-    plot(P100_profile90(:,:,location));
-    hold on;
-    ylabel('Attenuation (AU)');
-    xlabel('thickness (px)')
-    % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
-    title('90 kV');
-    ylim([-500 2500])
-    
+% Normalized plots % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+if doyouwantfigures == 1
+    % Plotting
+    figure
+    for location = 1:length(RESULT_PROFILES50)
+        % 50kV
+        subplot(1,2,1)
+        % plot(profiles50);
+        plot(P100_profile50(:,:,location));
+        hold on;
+        ylabel('Attenuation (AU)');
+        xlabel('thickness (px)')
+        % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+        title('Normalized 50 kV');
+        ylim([-500 6000])
+        
+        % 90 kV
+        % figure;
+        subplot(1,2,2)
+        % plot(profiles90);
+        plot(P100_profile90(:,:,location));
+        hold on;
+        ylabel('Attenuation (AU)');
+        xlabel('thickness (px)')
+        % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+        title('Normalized 90 kV');
+        ylim([-500 2500])
+        
+    end
 end
-    title('Contrast Agent Attenuation');
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+
+
 %
 % Plotting
 
@@ -141,29 +156,13 @@ stdprofiles50 = squeeze(std(P100_profile50,0,1));
 meanprofiles90 = squeeze(mean(P100_profile90,1));
 stdprofiles90 = squeeze(std(P100_profile90,0,1));
 
-%FIGURES
-figure;
-plot(timepoints,meanprofiles50, 'linewidth', 3)
-xlabel('Time (h)');
-ylabel('Attenuation (AU)')
-% hold on;
-% plot(timepoints,meanprofiles50+stdprofiles50, 'k--')
-% plot(timepoints,meanprofiles50-stdprofiles50, 'r--')
-title('Locations, 50 kV Profile');
 
-
-figure;
-plot(timepoints,meanprofiles90, 'linewidth', 3)
-xlabel('Time (h)');
-ylabel('Attenuation (AU)')
-% hold on;
-% plot(timepoints,meanprofiles90+stdprofiles90, 'k--')
-% plot(timepoints,meanprofiles90-stdprofiles90, 'r--')
-title('Locations, 90 kV Profile');
 % -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+%FIGURES
+% You want these plots:
 
 % % Diffusion rate
-% 
+%
 Diffusion_50 = meanprofiles50';
 Diffusion_90 = meanprofiles90';
 
@@ -183,7 +182,6 @@ ylabel('Attenuation (AU)')
 title('90 kV')
 % legend([''], 'location', 'southeastoutside');
 % legend('boxoff')
-
 
 % % % % % % % % % % % % % % % % AVERAGES FOR THE LOCATIONS --------------------------------------------------
 % % % % % % % % % % % % % % % finalmeanprofiles50 = mean(meanprofiles50,2);
@@ -233,26 +231,40 @@ for location = 1:length(RESULT_PROFILES50)
         
         % yyaxis left
         
-        % plot(timepoints, concentration_profile(1,:))
-        plot(depths, concentration_profile(1,:),'b')
-        % ylabel('Iodine (%)')
-        
-        hold on;
-        % yyaxis right
-        % plot(timepoints, concentration_profile(2,:), 'r')
-        plot(depths, concentration_profile(2,:), 'r')
-        title('Enzymatically + Mechanically - Partition in Cartilage','fontsize',14)
-        legend('I', 'Gd');
-        set(gca,'fontsize',14)
-        % ylabel('Gadolinium (%)');
-        % ylim([0 0.5]);
+        if doyouwantfigures == 1
+            % plot(timepoints, concentration_profile(1,:))
+            plot(depths, concentration_profile(1,:),'b')
+            % ylabel('Iodine (%)')
+            
+            hold on;
+            % yyaxis right
+            % plot(timepoints, concentration_profile(2,:), 'r')
+            plot(depths, concentration_profile(2,:), 'r')
+            title('Enzymatically + Mechanically - Partition in Cartilage','fontsize',14)
+            legend('I', 'Gd');
+            set(gca,'fontsize',14)
+            % ylabel('Gadolinium (%)');
+            % ylim([0 0.5]);
+        end
         
         GADOLINIUM(:,time,location) = concentration_profile(2,:)';
         IODINE(:,time,location) = concentration_profile(1,:)';
         
     end
+
 end
 
+name{sample_i} = filename(1:end-29)
+tempGd{sample_i} = squeeze(mean(GADOLINIUM));
+temp_I{sample_i} = squeeze(mean(IODINE));
+
+
+Eq_Gd(:,sample_i) = tempGd{sample_i}(end,:)';
+Eq_I(:,sample_i)= temp_I{sample_i}(end,:)';
+
+close all
+
+end %for sample_i
 %%
 
 
