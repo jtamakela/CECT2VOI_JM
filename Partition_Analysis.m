@@ -1,26 +1,29 @@
+function [name, tempGd, temp_I] = Partition_Analysis
+
 %% m-file for analysing earlier created contrast agent partitions
 %% Developed for triple contrast images
 %% The code is available at https://github.com/jtamakela/
 %% (c) Janne T.A. Mäkelä, August / 2019
 
-clear all, close all, clc;
+% clear all, close all, clc;
 
 % You want extra figures plotted?
 % 1 for yes
 doyouwantfigures = 0;
 
 % You can separately decide if you want all the profiles plotted
-doyouwantprofilefigures = 1;
+doyouwantprofilefigures = 0;
 
 
 files = dir('*Rotated_RESULT_PROFILES*.mat');
 
-for sample_i = 5:length(files)
+for sample_i = 1:length(files)
+%     for sample_i = [13,39,45] %FAILED
     %     sample_i = 1
     if doyouwantprofilefigures == 1 %If plotting, adding a pause
-        pause(0.5)
+%         pause(2)
     end
-    close all
+    
     clearvars -except files sample_i name tempGd temp_I Eq_Gd Eq_I doyouwantfigures doyouwantprofilefigures
     
     filename = files(sample_i).name; %Reads the last/latest mat file
@@ -49,7 +52,9 @@ for sample_i = 5:length(files)
     
     % Inspecting first the 50 kV
     % h2 = waitbar(0,'Loading the files, please wait...'); %Display waitbar
-    figure;
+    if doyouwantfigures == 1
+        figure;
+    end
     
     for location = 1:length(RESULT_PROFILES50)
         
@@ -164,6 +169,7 @@ for sample_i = 5:length(files)
     
     % -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     
+    
     if doyouwantprofilefigures == 1
         
         % % % % %FIGURES
@@ -171,8 +177,8 @@ for sample_i = 5:length(files)
         Diffusion_50 = meanprofiles50';
         Diffusion_90 = meanprofiles90';
         
-        hFig = figure(1);
-        set(hFig, 'Position', [256 356 1280 1280])
+        hFig(sample_i) = figure;
+        set(hFig(sample_i), 'Position', [256 356 1280 1280])
         subplot(2,1,1)
         plot(timepoints, Diffusion_50, 'o-', 'linewidth', 2)
         xlabel('Time (h)');
@@ -223,7 +229,9 @@ for sample_i = 5:length(files)
     
     
     for location = 1:length(RESULT_PROFILES50)
-        figure
+        if doyouwantfigures == 1 
+            figure
+        end
         
         for time = 1:7
             
@@ -270,7 +278,7 @@ for sample_i = 5:length(files)
     Eq_Gd(:,sample_i) = tempGd{sample_i}(end,:)';
     Eq_I(:,sample_i)= temp_I{sample_i}(end,:)';
     
-    close all
+    
     
     
 end %for sample_i
