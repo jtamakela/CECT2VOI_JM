@@ -14,7 +14,7 @@ whichfile = 1;
 
 
 %If saving == 1, saves the output
-saving = 0;
+saving = 1;
 
 % Analysis
 % Rectangle VOI - 1 mm3
@@ -22,8 +22,12 @@ saving = 0;
 
 
 % Loading the data  -----------------------------------------------------------------------------------
-filename = dir('*RotatedVOI_data*.mat');
-filename = filename(whichfile).name; %Reads the last mat file
+files = dir('*RotatedVOI_data*.mat');
+
+% '8Li4_RotatedVOI_data1.mat' whichfile = 49, location 5 manually. 
+
+for whichfile = 1:length(files)
+filename = files(whichfile).name; %Reads the last mat file
 load(filename);
 
 names = NEWDATA{1,1};
@@ -81,7 +85,7 @@ ylim([0 size(CECT90{location,timepoint},1)]);
 
 % % % CHECK THESE! % % % %
 resolution = 40;
-windowsize = 1000/40; %um/resolution. Default 1mm, typically 1040um because of uneven 
+windowsize = 1000/40; %um/resolution. Taking a window this size. No it's 1 mm
 % % % % % % % % % % % % % % 
 
 
@@ -100,7 +104,6 @@ clearvars profile50_x profile90_x
 if ishandle(98)
 close(98)
 end
-figure(98);
 
 % Removing the borders using diff between the timpoints
  %Taking diff. Seeing all similar values
@@ -109,106 +112,80 @@ background_i = CECT_edited == 0;
 
 % % % % % % Going through all the timepoints -------------
 for i = 1:8
-keke = CECT50{location,i};
-
-% Changing the background to zeroes
-keke(background_i) = nan;
-
-
-profile50_x(:,i) = reshape(nanmean(keke(x1:x2,y1:y2,:),[1 2]),[],1); % Here (x1:x2,y1:y2,:) makes the code inspect only the center
-
-%  For comparison, if you want to plot the unedited profiles
-% profile50_notedited_x(:,i) = reshape(nanmean(CECT50{location,i}(x1:x2,y1:y2,:),[1 2]),[],1); % Here (x1:x2,y1:y2,:) makes the code inspect only the center
-
-plot(profile50_x)
-hold on;
-
+    keke = CECT50{location,i};
+    
+    % Changing the background to zeroes
+    keke(background_i) = nan;
+    
+    profile50_x(:,i) = reshape(nanmean(keke(x1:x2,y1:y2,:),[1 2]),[],1); % Here (x1:x2,y1:y2,:) makes the code inspect only the center
+    
+    %  For comparison, if you want to plot the unedited profiles
+    % profile50_notedited_x(:,i) = reshape(nanmean(CECT50{location,i}(x1:x2,y1:y2,:),[1 2]),[],1); % Here (x1:x2,y1:y2,:) makes the code inspect only the center
+    if i == 1 %Displaying the result
+        figure(2)
+        subplot(1,2,1)
+        imagesc(squeeze(keke(:,floor(size(keke,2)/2),:)), [-1500 5000]);
+        view(90, 90)
+        axis equal
+        title('50 kV')
+        ylim([0 size(CECT90{location,timepoint},1)]);
+    end 
 end
 
 %Check a slice
 % % % figure; imagesc(squeeze(keke(:,33,:))); view(90, 90)
 
-title('50 kV profiles');
 
-if ishandle(99)
-close(99)
-end
-figure(99);
+% % % if ishandle(99)
+% % % close(99)
+% % % end
+% % % figure(99);
 for i = 1:8
-keke = CECT90{location,i};
-keke(background_i) = nan;
+    keke = CECT90{location,i};
+    keke(background_i) = nan;
+    
+    profile90_x(:,i) = reshape(nanmean(keke(x1:x2,y1:y2,:),[1 2]),[],1);
+    
+    if i == 1 %Displaying the result
+        figure(2);
+        subplot(1,2,2)
+        imagesc(squeeze(keke(:,floor(size(keke,2)/2),:)), [-1500 5000]); %Can't flip because it'll mess up the indexes
+        view(90, 90)
+        axis equal
+        title('90 kV')
+        ylim([0 size(keke,1)]); 
+    end
+end
 
-profile90_x(:,i) = reshape(nanmean(keke(x1:x2,y1:y2,:),[1 2]),[],1);
+% First the edited slice
 
+% % % % SEPARATE ENERGIES PLOT
+
+% Then the profiles
+figure(98);
+subplot(1,2,1)
+plot(profile50_x)
+title('50 kV profiles');
+legend('location','southeast');
+hold on;
+subplot(1,2,2)
 plot(profile90_x)
 hold on;
-
-end
 title('90 kV profiles');
+legend('location','southeast');
 
-%%
-% FINDING THE LAYERS ------------------------------------------------------------------------------------------
+%
+% FINDING THE INTERFACES ------------------------------------------------------------------------------------------
 
 % You can find the cartilage from the peaks of ka50 (first, last). Two points should be the same between 50 and 90
 
-%TAKE FIRST THE DIFFERENCE BETWEEN TIMEPOINTS. THIS'LL LEAVE THE RANDOM DATA LEFT
-% or use plain baseline
 
-figure; plot(profile50_x)
+% THE INTERFACES ARE NOW TAKEN FROM THE BASELINE
 %Taking difference between timepoints
-erot = diff(profile50_x,1,2);
-%Shows the borders (=0) that can be removed
-erot(erot == 0) = nan;
+difference = diff(profile50_x(:,1)); %Taking diff from the baseline
+% figure; plot(difference)
+% title('Baseline difference profile');
 
-%On the other hand, you now know where the borders are. 
-figure; plot(erot)
-
-erot2 = diff(erot);
-figure; plot(sum(erot2,2));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-sumfor50 = sum(profile50_x,2);
-sumfor90 = sum(profile90_x,2);
-
-%
-difference = diff(sumfor50);
-
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-% UNCOMMENT IF YOU WANT TO SEE THE PROFILE OR DIFFERENCE
-figure; plot(sumfor50); title('Sum');
-%  For comparison, if you want to plot the unedited profiles
-% hold on; plot(sum(profile50_notedited_x,2));
-
-figure; plot(difference); title('Diff');
-%  For comparison, if you want to plot the unedited profiles
-% hold on; plot(diff(sum(profile50_notedited_x,2)));
-
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-
-% Tässä on ongelma. Ei osaa enää löytää rajapintaa. Vois koeattaa ottaa nan:t ja -1000 pois
-% Tai vaihtoehtosesti ottaakin vasta toisen piikin?
-% Ainoastaan 5:ssa ei löytänyt luuta. 
 
 % [pks, locs] = findpeaks(difference(1:floor(length(difference)./2)),'NPeaks',1,'MinPeakWidth',3); %MinPeakWidth can exclude or
 % includewron peaks. Using xax instead
@@ -237,10 +214,11 @@ z2 = locs(2);
 % Displaying the lines in the image -----------------------------------------------------------------------------------------
 
 figure(98);
+subplot(1,2,1)
 line([locs(1) locs(1)], [min(profile50_x(:)) max(profile50_x(:))],'color','g');
 line([locs(2) locs(2)], [min(profile50_x(:)) max(profile50_x(:))],'color','r');
 
-figure(99);
+subplot(1,2,2)
 line([locs(1) locs(1)], [min(profile50_x(:)) max(profile90_x(:))],'color','g');
 line([locs(2) locs(2)], [min(profile50_x(:)) max(profile90_x(:))],'color','r');
 
@@ -315,9 +293,9 @@ end
 
 
 % Save, but don't overwrite
-if saving == 1;
-    savename = filename(1:end-14)
-save([savename, '_', 'RESULT_PROFILES', num2str(length(dir('*RESULT_PROFILES*.mat'))+1), '.mat'],'RESULT_PROFILES50', 'RESULT_PROFILES90')
+if saving == 1
+    savename = filename(1:end-13)
+save(['RESULT_PROFILES/', savename, '_', 'RESULT_PROFILES', num2str(length(dir(['*', num2str(savename),'*_RESULT*']) )+1), '.mat'],'RESULT_PROFILES50', 'RESULT_PROFILES90')
 end
 
 end % function
