@@ -5,7 +5,7 @@ function [name, tempGd, temp_I] = Partition_Analysis
 %% The code is available at https://github.com/jtamakela/
 %% (c) Janne T.A. Mäkelä, August / 2019
 
-% clear all, close all, clc;
+clear all, close all, clc;
 
 % You want extra figures plotted?
 % 1 for yes
@@ -15,7 +15,9 @@ doyouwantfigures = 0;
 doyouwantprofilefigures = 0;
 
 % If you want to analyze only specific samples
-chosen = {'2LR1',	'3LR1',	'4RR1',	'5RR1',	'6Li3',	'7Li3',	'8Ri3',	'9Ri3',	'10Ri3'};
+% chosen = {'3LR1',	'4RR1',	'5RR1',	'6Li3',	'7Li3',	'8Ri3',	'9Ri3',	'10Ri3'};
+% chosen = {	'5RR1'};
+plotcolors = ['rcgbkyr'];
 
 files = dir('*Rotated_RESULT_PROFILES*.mat');
 
@@ -23,14 +25,15 @@ for sample_i = 1:length(files)
     %     for sample_i = [13,39,45] %FAILED
     %     sample_i = 1
     
-    clearvars -except files sample_i name tempGd temp_I Eq_Gd Eq_I doyouwantfigures doyouwantprofilefigures chosen
+    clearvars -except files sample_i name tempGd temp_I Eq_Gd Eq_I doyouwantfigures doyouwantprofilefigures chosen plotcolors
     
     filename = files(sample_i).name; %Reads the last/latest mat file
 
     
     
     % Adding a rule that the execution is continued only if the file matches the chosen
-    if exist('chosen') && contains(num2str(cell2mat(chosen)),filename(1:4))
+    % Comment 'exist' out if you want this to execute
+    if ~exist('chosen') || contains(num2str(cell2mat(chosen)),filename(1:4))
         %         if isempty( strfind(num2str(cell2mat(chosen)),filename(1:4)) ) % Same thing        
         
         
@@ -46,9 +49,9 @@ for sample_i = 1:length(files)
         CA50 = [73.87, 89.58];
         CA90 = [29.53, 40.46];
         
-        % Constants
-        Water50 = 543.166; %Above values are normalized
-        Water90 = -234.254;
+        % Constants, not used
+%         Water50 = 543.166; %Above values are normalized
+%         Water90 = -234.254;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
@@ -83,7 +86,7 @@ for sample_i = 1:length(files)
                 % 50kV
                 subplot(1,2,1)
                 % plot(profiles50);
-                plot(P100_profile50(:,:,location));
+                plot(P100_profile50(:,:,location), 'color', num2str(plotcolors(location)));
                 hold on;
                 ylabel('Attenuation (AU)');
                 xlabel('thickness (px)')
@@ -95,7 +98,7 @@ for sample_i = 1:length(files)
                 % figure;
                 subplot(1,2,2)
                 % plot(profiles90);
-                plot(P100_profile90(:,:,location));
+                plot(P100_profile90(:,:,location), 'color', num2str(plotcolors(location)));
                 hold on;
                 ylabel('Attenuation (AU)');
                 xlabel('thickness (px)')
@@ -118,12 +121,13 @@ for sample_i = 1:length(files)
         
         
         % % % % % Subtracting cartilage
-        P100_profile50 = P100_profile50-(P100_profile50(:,1,:)); %Water doesn't need to be subtracted here as it is already done in calibration
-        P100_profile90 = P100_profile90-(P100_profile90(:,1,:));
+        P100_profile50 = P100_profile50-(P100_profile50(:,2,:)); %Water doesn't need to be subtracted here as it is already done in calibration
+        P100_profile90 = P100_profile90-(P100_profile90(:,2,:));
         
         
-        P100_profile50(:,1,:) = []; %Removing zeroes
+        P100_profile50(:,1,:) = []; %Removing baseline
         P100_profile90(:,1,:) = [];
+               
         
         % Normalized plots % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
         if doyouwantfigures == 1
@@ -133,7 +137,7 @@ for sample_i = 1:length(files)
                 % 50kV
                 subplot(1,2,1)
                 % plot(profiles50);
-                plot(P100_profile50(:,:,location));
+                plot(P100_profile50(:,:,location), 'color', num2str(plotcolors(location)));
                 hold on;
                 ylabel('Attenuation (AU)');
                 xlabel('thickness (px)')
@@ -145,7 +149,7 @@ for sample_i = 1:length(files)
                 % figure;
                 subplot(1,2,2)
                 % plot(profiles90);
-                plot(P100_profile90(:,:,location));
+                plot(P100_profile90(:,:,location), 'color', num2str(plotcolors(location)));
                 hold on;
                 ylabel('Attenuation (AU)');
                 xlabel('thickness (px)')
@@ -173,7 +177,7 @@ for sample_i = 1:length(files)
         % plot(depths,meanprofiles50, 'linewidth', 3) %Depth-dependent profiles at different timepoints
         
         
-        
+
         % -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
         
         
@@ -191,7 +195,7 @@ for sample_i = 1:length(files)
             xlabel('Time (h)');
             ylabel('Attenuation (AU)')
             title('Locations, 50 kV Profile');
-            lgd = legend(num2str(floor(depths)'), 'location' ,'southeast');
+            lgd = legend(num2str([1:6]'), 'location' ,'southeast');
             title(lgd,'Location')
             
             subplot(2,1,2)
@@ -256,14 +260,16 @@ for sample_i = 1:length(files)
                 
                 if doyouwantfigures == 1
                     % plot(timepoints, concentration_profile(1,:))
-                    plot(depths, concentration_profile(1,:),'b')
+                    yyaxis left
+                    plot(depths, concentration_profile(1,:), '-', 'color', num2str(plotcolors(time)))
                     % ylabel('Iodine (%)')
                     
                     hold on;
                     % yyaxis right
                     % plot(timepoints, concentration_profile(2,:), 'r')
-                    plot(depths, concentration_profile(2,:), 'r')
-                    title('Enzymatically + Mechanically - Partition in Cartilage','fontsize',14)
+                    yyaxis right
+                    plot(depths, concentration_profile(2,:), '--', 'color', num2str(plotcolors(time)))
+                    title('Partition in Cartilage','fontsize',14)
                     legend('I', 'Gd');
                     set(gca,'fontsize',14)
                     % ylabel('Gadolinium (%)');
@@ -277,7 +283,7 @@ for sample_i = 1:length(files)
             
         end
         
-        name{sample_i} = filename(1:end-29);
+        names_CECT{sample_i} = filename(1:end-29);
         tempGd{sample_i} = squeeze(mean(GADOLINIUM));
         temp_I{sample_i} = squeeze(mean(IODINE));
         
@@ -287,13 +293,13 @@ for sample_i = 1:length(files)
         Eq_Gd(:,sample_i) = tempGd{sample_i}(end,:)';
         Eq_I(:,sample_i)= temp_I{sample_i}(end,:)';
         
-        
+%         break % Adding this rule for debugging. Inspects only the first 
     end %if 'chosen' exists and filename contains the chosen
     
     
 end %for sample_i
 
-
+% save('CECT_data.mat', 'name', 'tempGd', 'temp_I');
 
 
 
