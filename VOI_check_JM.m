@@ -7,9 +7,23 @@ close all
 
 % This just for checking the registration
 
-filename = dir('*_RotatedVOI_data*.mat');
-filename = filename(end).name; %Reads the last mat file
+whichsample = 10; %Which sample you want plotted
+
+filename = dir('*RotatedVOI_data*.mat');
+% 5RR1_ is bad
+
+
+% If you analyse original VOIs (not rotated for the 2nd time)
+% filename = dir('*VOI_data*.mat'); 
+
+filename = filename(whichsample).name; %Reads the last mat file
 load(filename);
+
+% This needs to be done if using original (unoriented) data
+onko = exist('DATA');
+if onko == 1
+NEWDATA = DATA;
+end
 
 % % % % BEFORE ORIENTATION
 % % % name = DATA;
