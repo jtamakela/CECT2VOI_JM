@@ -1,4 +1,4 @@
-function [name, tempGd, temp_I] = Partition_Analysis
+function [names_CECT, tempGd, temp_I] = Partition_Analysis
 
 %% m-file for analysing earlier created contrast agent partitions
 %% Developed for triple contrast images
@@ -16,8 +16,8 @@ doyouwantprofilefigures = 0;
 
 % If you want to analyze only specific samples
 % chosen = {'3LR1',	'4RR1',	'5RR1',	'6Li3',	'7Li3',	'8Ri3',	'9Ri3',	'10Ri3'};
-% chosen = {	'5RR1'};
-plotcolors = ['rcgbkyr'];
+% chosen = {'5LR2'};
+plotcolors = ['yrcgbkyr'];
 
 files = dir('*Rotated_RESULT_PROFILES*.mat');
 
@@ -25,7 +25,7 @@ for sample_i = 1:length(files)
     %     for sample_i = [13,39,45] %FAILED
     %     sample_i = 1
     
-    clearvars -except files sample_i name tempGd temp_I Eq_Gd Eq_I doyouwantfigures doyouwantprofilefigures chosen plotcolors
+    clearvars -except files sample_i names_CECT tempGd temp_I Eq_Gd Eq_I doyouwantfigures doyouwantprofilefigures chosen plotcolors
     
     filename = files(sample_i).name; %Reads the last/latest mat file
 
@@ -39,19 +39,48 @@ for sample_i = 1:length(files)
         
         load(filename);
         
-        % 10 mgI/ml, 20 mgGd/ml
         % CORRECTED COEFFICIENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % By Ali % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
         % As a function of concentration
         % Calibration/Phantom_measurement.xlsx
-        Gd50 = [36.32, 49.64];
-        Gd90 = [37.34, 20.50];
+        % HOUNSFIELDS
+%         From Ali
+        Gd50 = [37.34, 20.50];
+        Gd90 = [36.32, 49.64];
         CA50 = [73.87, 89.58];
         CA90 = [29.53, 40.46];
+        % ARBITRARY UNITS (RAW DATA)
+
+        
+        % 2 months later. Gd perhaps gone bad?
+%         Gd50 = [45.7 19.87];
+%         Gd90 = [45.1 0.098];
+%         CA50 = [73.98 16.22];
+%         CA90 = [28.36 10.63];
+
         
         % Constants, not used
 %         Water50 = 543.166; %Above values are normalized
 %         Water90 = -234.254;
+
+
+% FROM ABHISEK (HU)
+% αI(50 kV) = 54.75 CI + 65.41
+% αI(90 kV) = 35.21 CI + 59.91
+% b) gadolinium
+% αGd(50 kV) = 34.28 CGd + 40.31
+% αGd(90 kV) = 54.81 CGd + 53.77
+
+% FROM ABHISEK (AU)
+% αI(50 kV) = 119 CI + 142 
+% αI(90 kV) =  46 CI + 78
+% b) gadolinium
+% αGd(50 kV) = 75 CGd + 76
+% αGd(90 kV) = 72 CGd + 100 
+
+
+
+
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
@@ -62,10 +91,7 @@ for sample_i = 1:length(files)
         
         % Inspecting first the 50 kV
         % h2 = waitbar(0,'Loading the files, please wait...'); %Display waitbar
-        if doyouwantfigures == 1
-            figure;
-        end
-        
+
         for location = 1:length(RESULT_PROFILES50)
             
             profiles50 = RESULT_PROFILES50{location};
@@ -79,34 +105,7 @@ for sample_i = 1:length(files)
             % hold on;
             % plot(p100_profile50,'*');
             P100_profile90(:,:,location) = interp1(linspace(1,100,size(profiles90,1)), profiles90, depths,'pchip');
-            
-            
-            if doyouwantfigures == 1
-                % Depth-dependent attenuation profiles for all the measurement locations at each timepoints
-                % 50kV
-                subplot(1,2,1)
-                % plot(profiles50);
-                plot(P100_profile50(:,:,location), 'color', num2str(plotcolors(location)));
-                hold on;
-                ylabel('Attenuation (AU)');
-                xlabel('thickness (px)')
-                % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
-                title('Raw 50 kV');
-                ylim([-500 6000])
-                
-                % 90 kV
-                % figure;
-                subplot(1,2,2)
-                % plot(profiles90);
-                plot(P100_profile90(:,:,location), 'color', num2str(plotcolors(location)));
-                hold on;
-                ylabel('Attenuation (AU)');
-                xlabel('thickness (px)')
-                % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
-                title('Raw 90 kV');
-                ylim([-1000 2500])
-                
-            end
+   
             % waitbar(location/6);
             
         end
@@ -121,39 +120,67 @@ for sample_i = 1:length(files)
         
         
         % % % % % Subtracting cartilage
-        P100_profile50 = P100_profile50-(P100_profile50(:,2,:)); %Water doesn't need to be subtracted here as it is already done in calibration
-        P100_profile90 = P100_profile90-(P100_profile90(:,2,:));
+        P100_profile50_normal = P100_profile50-(P100_profile50(:,1,:)); %Water doesn't need to be subtracted here as it is already done in calibration
+        P100_profile90_normal = P100_profile90-(P100_profile90(:,1,:));
         
         
-        P100_profile50(:,1,:) = []; %Removing baseline
-        P100_profile90(:,1,:) = [];
+        P100_profile50_normal(:,1,:) = []; %Removing baseline
+        P100_profile90_normal(:,1,:) = [];
                
         
         % Normalized plots % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
         if doyouwantfigures == 1
             % Plotting
             figure
-            for location = 1:length(RESULT_PROFILES50)
+            for time = 1:size(P100_profile50,2)
+                
+                                % Depth-dependent attenuation profiles for all the measurement locations at each timepoints
                 % 50kV
-                subplot(1,2,1)
+                subplot(2,2,1)
                 % plot(profiles50);
-                plot(P100_profile50(:,:,location), 'color', num2str(plotcolors(location)));
+                plot(squeeze(P100_profile50(:,time,:)), 'color', num2str(plotcolors(time)));
                 hold on;
                 ylabel('Attenuation (AU)');
                 xlabel('thickness (px)')
                 % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+                title('Raw 50 kV');
+                ylim([-500 6000])
+                
+                % 90 kV
+                % figure;
+                subplot(2,2,2)
+                % plot(profiles90);
+                plot(squeeze(P100_profile90(:,time,:)), 'color', num2str(plotcolors(time)));
+                hold on;
+                ylabel('Attenuation (AU)');
+                xlabel('thickness (px)')
+                % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+                title('Raw 90 kV');
+                ylim([-1000 2500])
+                
+            end
+            for time = 1:size(P100_profile50_normal,2)
+                
+                % 50kV
+                subplot(2,2,3)
+                % plot(profiles50);
+                plot(squeeze(P100_profile50_normal(:,time,:)), 'color', num2str(plotcolors(time+1)));
+                hold on;
+                ylabel('Attenuation (AU)');
+                xlabel('thickness (px)')
+                % legend(fileorder{1:2:end}, 'time', 'se', 'interpreter', 'none')
                 title('Normalized 50 kV');
                 ylim([-500 6000])
                 
                 % 90 kV
                 % figure;
-                subplot(1,2,2)
+                subplot(2,2,4)
                 % plot(profiles90);
-                plot(P100_profile90(:,:,location), 'color', num2str(plotcolors(location)));
+                plot(squeeze(P100_profile90_normal(:,time,:)), 'color', num2str(plotcolors(time+1)));
                 hold on;
                 ylabel('Attenuation (AU)');
                 xlabel('thickness (px)')
-                % legend(fileorder{1:2:end}, 'location', 'se', 'interpreter', 'none')
+                % legend(fileorder{1:2:end}, 'time', 'se', 'interpreter', 'none')
                 title('Normalized 90 kV');
                 ylim([-500 2500])
                 
@@ -165,10 +192,10 @@ for sample_i = 1:length(files)
         %
         % Plotting
         
-        meanprofiles50 = squeeze(mean(P100_profile50,1)); %Averaging the thickness
-        stdprofiles50 = squeeze(std(P100_profile50,0,1));
-        meanprofiles90 = squeeze(mean(P100_profile90,1));
-        stdprofiles90 = squeeze(std(P100_profile90,0,1));
+        meanprofiles50 = squeeze(mean(P100_profile50_normal,1)); %Averaging the thickness
+        stdprofiles50 = squeeze(std(P100_profile50_normal,0,1));
+        meanprofiles90 = squeeze(mean(P100_profile90_normal,1));
+        stdprofiles90 = squeeze(std(P100_profile90_normal,0,1));
         
         
         % % If you want to look the depth-dependent profiles
@@ -234,24 +261,32 @@ for sample_i = 1:length(files)
         
         %
         
-        % Annin koodia
+        
+        % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+        % 10 mgI/ml, 20 mgGd/ml
+
         C_CA = 10;% Change if you want partition: 10;
         C_Gd = 20;%20;
         
+        % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
         
         for location = 1:length(RESULT_PROFILES50)
             if doyouwantfigures == 1
                 figure
             end
             
-            for time = 1:7
+            
+            for time = 1:size(P100_profile50_normal,2)
                 
-                A = [CA50(1)*C_CA+CA50(2) Gd50(1)*C_Gd+Gd50(2); %Keeping the residue in results (zero points)
-                    CA90(1)*C_CA+CA90(2) Gd90(1)*C_Gd+CA90(2)];
+% % % % %                 
+                A = [CA50(1)*C_CA Gd50(1)*C_Gd ; %Keeping the residue in results (zero points)
+                    CA90(1)*C_CA Gd90(1)*C_Gd];
                 
+                % A*x = b
                 
                 % b = [meanprofiles50(:,location) meanprofiles90(:,location)]';
-                b = [P100_profile50(:,time,location) P100_profile90(:,time,location)]';
+                b = [P100_profile50_normal(:,time,location) P100_profile90_normal(:,time,location)]';
+%                 b = [845 570]';%A coctail, 5 I, 10 Gd
                 
                 
                 concentration_profile = A\b;
@@ -261,23 +296,24 @@ for sample_i = 1:length(files)
                 if doyouwantfigures == 1
                     % plot(timepoints, concentration_profile(1,:))
                     yyaxis left
-                    plot(depths, concentration_profile(1,:), '-', 'color', num2str(plotcolors(time)))
+                    plot(depths, concentration_profile(1,:), '-', 'color', num2str(plotcolors(time+1)))
                     % ylabel('Iodine (%)')
                     
                     hold on;
                     % yyaxis right
                     % plot(timepoints, concentration_profile(2,:), 'r')
                     yyaxis right
-                    plot(depths, concentration_profile(2,:), '--', 'color', num2str(plotcolors(time)))
+                    plot(depths, concentration_profile(2,:), '--', 'color', num2str(plotcolors(time+1)))
                     title('Partition in Cartilage','fontsize',14)
-                    legend('I', 'Gd');
+                    legend(num2str(timepoints'), 'location', 'southeast');
                     set(gca,'fontsize',14)
                     % ylabel('Gadolinium (%)');
                     % ylim([0 0.5]);
                 end
                 
-                GADOLINIUM(:,time,location) = concentration_profile(2,:)';
-                IODINE(:,time,location) = concentration_profile(1,:)';
+                %Taking into account only the chosen depth
+                GADOLINIUM(:,time,location) = concentration_profile(2,31:40)';
+                IODINE(:,time,location) = concentration_profile(1,31:40)';
                 
             end
             
@@ -299,7 +335,7 @@ for sample_i = 1:length(files)
     
 end %for sample_i
 
-% save('CECT_data.mat', 'name', 'tempGd', 'temp_I');
+% save('CECT_data_60_80.mat', 'names_CECT', 'tempGd', 'temp_I');
 
 
 
