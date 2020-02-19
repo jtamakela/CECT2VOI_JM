@@ -1,4 +1,4 @@
-function  NEW_CECT = CECTVOI_Rotate
+function  NEW_DATA = CECTVOI_Rotate % Doesn't need to be a function
 
 %% m-file for further rotating the earlier created CECT image VOIs
 % Uses CECTVOI_Alignment and find_demarcation to turn
@@ -11,16 +11,18 @@ function  NEW_CECT = CECTVOI_Rotate
 % clear all, close all, clc;
 
 % Are we saving?
-saving = 0; % 1 for saving
+saving = 1; % 1 for saving
 
 
 %Testing if this returns the angles
 
-filelist = dir('*VOI_data*.mat');
+% Don't change the file name, won't work with CECTVOI_Alignment
+filelist = dir('*_VOI_data*.mat');
 
 
-
-for whichfile = 7%:length(filename);  %Which sample
+for whichfile = 1:length(filelist)  %Which sample
+    clearvars -except saving filelist whichfile
+    close all
     
     
     % Going through all the timepoints
@@ -64,8 +66,7 @@ for whichfile = 7%:length(filename);  %Which sample
     
     % Don't overwrite
     if saving == 1
-        
-        save([savename, '_RotatedVOI_data', num2str(length(dir('*_RotatedVOI_data*.mat'))+1), '.mat'], 'NEWDATA');
+        save([savename, '_RotatedVOI_data', num2str(length(dir(['*', num2str(savename),'_Rotated*']))+1), '.mat'], 'NEWDATA');
     end
     
     
