@@ -87,6 +87,8 @@ for sample_i = 1:length(files)
         fileorder = {'Baseline_50','Baseline_90','0h_50','0h_90', '30min_50','30min_90','1h_50','1h_90','2h_50','2h_90','6h_50','6h_90','10h_50','10h_90','23h_50','23h_90'};
         timepoints = [0, 0.5, 1, 2, 6, 10, 23]; %hours
         interpolation_n = 50; %You can determine how many points the data is interpolated into.
+        limitbeginning = 40; %Depth in percents
+        limitend = 60; %Depth in percents
         depths = linspace(1,100, interpolation_n);
         
         % Inspecting first the 50 kV
@@ -312,8 +314,8 @@ for sample_i = 1:length(files)
                 end
                 
                 %Taking into account only the chosen depth
-                GADOLINIUM(:,time,location) = concentration_profile(2,31:40)';
-                IODINE(:,time,location) = concentration_profile(1,31:40)';
+                GADOLINIUM(:,time,location) = concentration_profile(2,(limitbeginning/100*interpolation_n)+1:limitend/100*interpolation_n)';
+                IODINE(:,time,location) = concentration_profile(1,(limitbeginning/100*interpolation_n)+1:limitend/100*interpolation_n)';
                 
             end
             
