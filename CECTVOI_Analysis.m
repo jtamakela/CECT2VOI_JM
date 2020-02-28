@@ -8,8 +8,9 @@ function [RESULT_PROFILES50, RESULT_PROFILES90] = CECTVOI_Analysis
 
 clear all, close all, clc;
 
+% USE ONLY WHEN ANALYZING ONE
 % Which measurement
-whichfile = 1;
+% whichfile = 1;
 % Not working: 2, 5, 9
 
 
@@ -22,7 +23,7 @@ saving = 1;
 
 
 % Loading the data  -----------------------------------------------------------------------------------
-files = dir('*RotatedVOI_data*.mat');
+files = dir('*_RotatedVOI_data*.mat');
 
 % '8Li4_RotatedVOI_data1.mat' whichfile = 49, location 5 manually. 
 
@@ -189,16 +190,22 @@ difference = diff(profile50_x(:,1)); %Taking diff from the baseline
 
 % [pks, locs] = findpeaks(difference(1:floor(length(difference)./2)),'NPeaks',1,'MinPeakWidth',3); %MinPeakWidth can exclude or
 % includewron peaks. Using xax instead
-[pks_temp1, locs_temp1] = findpeaks(difference(1:floor(length(difference)./2))); 
+[pks_temp1, locs_temp1] = findpeaks(difference(1:floor(length(difference).*3/5))); %Not dividing in equal halfs because the interfaces might lie on the wrong side
 [pks, in] = max(pks_temp1); %finding the max
+if difference(locs_temp1(in)) >= 550 %Makes sure that were not choosing the cartilage-bone interface which has high diff
+    in = in-1; %Picking the second to last
+     if difference(locs_temp1(in)) < 250 %Making sure that we're not picking anything inside the cartilage
+           in = in-1;
+     end
+end
 locs = locs_temp1(in); %Finding the location
 
 % [pks(2), locs(2)] = findpeaks(difference(floor(length(difference)./2)+1:end),'NPeaks',1,'MinPeakWidth',2);
 % locs(2) = locs(2) + floor(length(difference)./2)+1; %Correcting the index (missing the beginning)
 
-[pks_temp2, locs_temp2] = findpeaks(difference(floor(length(difference)./2)+1:end));
+[pks_temp2, locs_temp2] = findpeaks(difference(floor(length(difference).*2/5)+1:end));
 [pks(2), in(2)] = max(pks_temp2); %finding the max
-locs(2) = locs_temp2(in(2)) + floor(length(difference)./2); %Finding the location (and adding the missing half to the index)
+locs(2) = locs_temp2(in(2)) + floor(length(difference).*2/5); %Finding the location (and adding the missing half to the index)
 
 
 
